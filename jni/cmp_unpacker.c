@@ -34,7 +34,7 @@ void error_and_exit(const char *msg) {
 
 int main(int argc, char** argv) {
 	if( 1 >= argc){
-		printf("usage: %s file offset length\n", dirname(argv[0]));
+		printf("usage: %s file offset length\n", basename(argv[0]));
 		return 0;
 	}
 	FILE *fh = NULL;
