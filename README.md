@@ -1,0 +1,2 @@
+# PureNDKProjectSample
+简单的NDK工程，主要为了随手建立一个工程测试本地可执行代码
