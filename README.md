@@ -134,7 +134,7 @@ hello, ndk! this is my own toolchain! ^-^
 
 #NDK编译器
 
-## 创建工具链
+1. 创建工具链
 
 android ndk提供脚本，允许自己定制一套工具链。例如：
 
@@ -143,7 +143,7 @@ $NDK/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir
 将会在/tmp/my-android-toolchain 中创建 sysroot 环境和 工具链。--arch 选项选择目标程序的指令架构，默认是为 arm。
 如果不加 --install-dir 选项，则会创建 /tmp/ndk/<toolchain-name>.tar.bz2。
 
-## 设置环境变量
+2. 设置环境变量
 
 运行上面make-standalone-toolchain.sh命令创建工具链之后，再：
 ```shell
@@ -153,12 +153,11 @@ $ export CXX=arm-linux-androideabi-g++
 $ export CXXFLAGS="-lstdc++"
 ```
 
-##使用make
+3. 使用make
 
 执行完以上设置环境变量的命令之后，就可以直接编译了（例如，执行 ./configure 然后 make 得到的就是 arm 程序了）。不用再设定 sysroot, CC 了。而且，可以使用 STL，异常，RTTI。
 
-
-## make-standalone-toolchain.sh --help 查看帮助
+4. make-standalone-toolchain.sh --help 查看帮助
 ```shell
 $ /cygdrive/f/Android/android-ndk-r10/build/tools/make-standalone-toolchain.sh --help
 
@@ -185,6 +184,6 @@ Valid options (defaults are in brackets):
   --platform=<name>        Specify target Android platform/API level. [android-3]
 ```
 
-## Windows支持
+# Windows支持
 Windows上的NDK工具链不依赖 Cygwin，但是这些工具不能理解Cygwin的路径名（例如，/cygdrive/c/foo/bar）。只能理解C:/cygdrive/c/foo/bar这类路径。不过，NDK 提供的build工具能够很好地应对上述问题（ndk-build）。
 
