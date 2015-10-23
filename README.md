@@ -11,6 +11,9 @@
 6. $ adb shell a /data/local/tmp/cmp_unpack
 7. OK.
 
+$ ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
+NDK_PROJECT_PATH 指定了需要编译的代码的工程目录，这里给出的是当前目录，APP_BUILD_SCRIPT给出的是Android makefile文件的路径，当然，如果你还有 Application.mk 文件的话，则可以添加 NDK_APP_APPLICATION_MK=./Application.mk 
+
 
 # a ndk-build problem
 * question
