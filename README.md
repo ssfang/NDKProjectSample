@@ -268,5 +268,13 @@ make
 
 
 # Windows支持
+
 Windows上的NDK工具链不依赖 Cygwin，但是这些工具不能理解Cygwin的路径名（例如，/cygdrive/c/foo/bar）。只能理解C:/cygdrive/c/foo/bar这类路径。不过，NDK 提供的build工具能够很好地应对上述问题（ndk-build）。
 
+5.2 wchar_t 支持  
+wchar_t  类型仅从 Android 2.3 开始支持。在 android-9 上， wchar_t 是 4字节。 并且 C语言库提供支持宽字符的函数（例外：multi-byte 编码/解码 函数 和 wsprintf/wsscanf ）在android-9 以前的平台上，wchar_t 是1字节，而且宽字符函数不起作用。建议不使用 wchar_t，提供 wchar_t 支持是为了方便移植以前的代码。
+
+5.3 异常， RTTI 和 STL  
+NDK 工具链默认支持C++异常和RTTI（Run Time Type Information），可以用 -fno-exception 和 -fno-rtti 关闭（生成的机器码更小）
+注意： 如果要用这两个特性，需要显式链接 libsupc++。例如： arm-linux-androideabi-g++ .... -lsupc++ 
+NDK 提供了 libstdc++，因而可以用 STL，但需要显式链接 libstdc++ ( gcc ... -lstdc++)。不过在将来可以不用手动指定这个链接参数。
