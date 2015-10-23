@@ -184,6 +184,89 @@ Valid options (defaults are in brackets):
   --platform=<name>        Specify target Android platform/API level. [android-3]
 ```
 
+
+比如，android-ndk-r10自带的工具链，我这里在F:\Android\android-ndk-r10\toolchains目录下：
+```shell
+fangss@fangss-PC ~
+$ ll /cygdrive/f/Android/android-ndk-r10/toolchains
+total 0
+d---------+ 1 fangss None 0 Dec  9  2014 arm-linux-androideabi-4.6
+d---------+ 1 fangss None 0 Dec  9  2014 arm-linux-androideabi-4.8
+d---------+ 1 fangss None 0 Dec  9  2014 arm-linux-androideabi-clang3.3
+d---------+ 1 fangss None 0 Dec  9  2014 arm-linux-androideabi-clang3.4
+d---------+ 1 fangss None 0 Dec  9  2014 llvm-3.3
+d---------+ 1 fangss None 0 Dec  9  2014 llvm-3.4
+d---------+ 1 fangss None 0 Dec  9  2014 mipsel-linux-android-4.6
+d---------+ 1 fangss None 0 Dec  9  2014 mipsel-linux-android-4.8
+d---------+ 1 fangss None 0 Dec  9  2014 mipsel-linux-android-clang3.3
+d---------+ 1 fangss None 0 Dec  9  2014 mipsel-linux-android-clang3.4
+d---------+ 1 fangss None 0 Dec  9  2014 renderscript
+d---------+ 1 fangss None 0 Dec  9  2014 x86-4.6
+d---------+ 1 fangss None 0 Dec  9  2014 x86-4.8
+d---------+ 1 fangss None 0 Dec  9  2014 x86-clang3.3
+d---------+ 1 fangss None 0 Dec  9  2014 x86-clang3.4
+```
+[OUTPUT TRUNCATED]
+
+现在我们自己创建，在Cygwin下执行make-standalone-toolchain.sh，如果出现如下权限问题，可以右键管理员身份运行Cygwin。
+```shell
+fangss@fangss-PC ~
+$ /cygdrive/f/Android/android-ndk-r10/build/tools/make-standalone-toolchain.sh --platform=android-9  --install-dir=/cygdrive/f/Android/android-ndk-r10/toolchains/my-arm-linux-androideabi
+Auto-config: --toolchain=arm-linux-androideabi-4.6
+Copying prebuilt binaries...
+find: '/tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/arm-linux-androideabi': Permission denied
+find: '/tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/bin': Permission denied
+find: '/tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/lib': Permission denied
+find: '/tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/libexec': Permission denied
+find: '/tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/share': Permission denied
+mkdir: cannot create directory '/tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/lib': Permission denied
+ERROR: Cannot copy to directory: /tmp/ndk-fangss/tmp/build-8324/standalone/arm-linux-androideabi-4.6/lib/python2.7
+```
+正确的输出，结果可能my-arm-linux-androideabi文件夹很大
+```shell
+$ /cygdrive/f/Android/android-ndk-r10/build/tools/make-standalone-toolchain.sh --platform=android-9  --install-dir=/cygdrive/f/Android/android-ndk-r10/toolchains/my-arm-linux-androideabi
+Auto-config: --toolchain=arm-linux-androideabi-4.6
+Copying prebuilt binaries...
+Copying sysroot headers and libraries...
+Copying c++ runtime headers and libraries...
+Copying files to: /cygdrive/f/Android/android-ndk-r10/toolchains/
+Cleaning up...
+Done.
+```
+其中，生成的一些文件：
+
+* add2line：将你要找的地址转成文件和行号，它要使用 debug 信息。
+* ar      ：产生、修改和解开一个存档文件
+* as      ：gnu的汇编器
+* c++filt ：C++ 和 java 中有一种重载函数，所用的重载函数最后会被编译转化成汇编的标，c++filt 就是实现这种反向的转化，根据标号得到函数名。
+* gprof   ：gnu 汇编器预编译器。
+* ld      ：gnu 的连接器
+* nm      ：列出目标文件的符号和对应的地址
+* objcopy ：将某种格式的目标文件转化成另外格式的目标文件
+* objdump ：显示目标文件的信息
+* ranlib  ：为一个存档文件产生一个索引，并将这个索引存入存档文件中
+* readelf ：显示 elf 格式的目标文件的信息
+* size    ：显示目标文件各个节的大小和目标文件的大小
+* strings ：打印出目标文件中可以打印的字符串，有个默认的长度，为4
+* strip   ：剥掉目标文件的所有的符号信息
+
+
+之后就可以使用了，还可配置如下环境
+
+```shell
+export PATH=/cygdrive/f/Android/android-ndk-r10/toolchains/my-arm-linux-androideabi/bin:$PATH
+export CC=arm-linux-androideabi-gcc
+export RANLIB=arm-linux-androideabi-ranlib
+export AR=arm-linux-androideabi-ar
+export LD=arm-linux-androideabi-ld
+```
+
+再就是可以编译第三方库，如libpcap
+cd libpcap-1.7.4
+./configure --host=arm-linux --with-pcap=~/tcpdump/libpcap-1.7.4 ac_cv_linux_vers=2
+make
+
+
 # Windows支持
 Windows上的NDK工具链不依赖 Cygwin，但是这些工具不能理解Cygwin的路径名（例如，/cygdrive/c/foo/bar）。只能理解C:/cygdrive/c/foo/bar这类路径。不过，NDK 提供的build工具能够很好地应对上述问题（ndk-build）。
 
