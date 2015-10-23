@@ -62,7 +62,7 @@ VistualGDB
 
 #使用makefile的库
 
-一般Android写c/c++的NDK使用Android.mk。当使用其他开源库时，大多是通过Makefile编译的，而又可能再使用其它开源库，如果在写Android.mk会很麻烦。虽然一些可以在AOSP中可以找到。这些其实和toolchain有关。故可以独立出一个toolchain，直接使用Makefile，而不需要自己去重新编写Android.mk文件，减少了很多麻烦。
+一般Android写c/c++的NDK使用Android.mk。当使用其他开源库时，大多是通过Makefile编译的，而又可能再使用其它开源库，如果再写Android.mk会很麻烦。虽然一些可以在AOSP中可以找到。这些其实和toolchain有关。故可以独立出一个toolchain，直接使用Makefile，而不需要自己去重新编写Android.mk文件，减少了很多麻烦。
 
 从Android NDK中独立toolchain步骤（系统为Ubuntu(32位)）：
 
@@ -84,14 +84,15 @@ Cleaning up...
 Done.  
 
 说明独立的工具链成功，对执行的命令进行简单说明：
-```
-/mnt/android-ndk-r9c/build/tools/make-standalone-toolchain.sh：执行NDK目录下make-standalone-toolchain.sh脚本；
---platform：指工具链将使用哪个版本的Android API，可cd /mnt/android-ndk-r9c/platform中查看，我这里使用的是Android-19；
---toolchain:指独立出来的工具链哪种用途的编译，arm(arm-linux-androideabi-4.8),X86(x86-4.8)或MIPS(mipsel-linux-android-4.8)，可cd toolchains中查看并选择适合的类型，我这里使用的是嵌入式；
---stl:指工具链支持C++ stl，stlport代表C++库将静态链接，stlport_shared将动态链接；
---install-dir:指安装目录；
+
+* /mnt/android-ndk-r9c/build/tools/make-standalone-toolchain.sh：执行NDK目录下make-standalone-toolchain.sh脚本；
+* --platform：指工具链将使用哪个版本的Android API，可cd /mnt/android-ndk-r9c/platform中查看，我这里使用的是Android-19；
+* --toolchain:指独立出来的工具链哪种用途的编译，arm(arm-linux-androideabi-4.8),X86(x86-4.8)或MIPS(mipsel-linux-android-4.8)，可cd toolchains中查看并选择适合的类型，我这里使用的是嵌入式；
+* --stl:指工具链支持C++ stl，stlport代表C++库将静态链接，stlport_shared将动态链接；
+* --install-dir:指安装目录；
+
 注意：因为我使用的是32-bit Ubuntu，独立工具链默认是32位，所以在参数中没有指定系统类型，如果是64-bit Linux系统，需加入--system=linux-x86_64 或MacOSX加入--system=darwin-x86_64。
-```
+
 
 3、测试程序
 ```c++
@@ -129,3 +130,61 @@ clean:
 root@android :/data # ./main                                                
 hello, ndk! this is my own toolchain! ^-^
 ```
+
+
+#NDK编译器
+
+## 创建工具链
+
+android ndk提供脚本，允许自己定制一套工具链。例如：
+
+$NDK/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir=/tmp/my-android-toolchain [ --arch=x86 ]
+
+将会在/tmp/my-android-toolchain 中创建 sysroot 环境和 工具链。--arch 选项选择目标程序的指令架构，默认是为 arm。
+如果不加 --install-dir 选项，则会创建 /tmp/ndk/<toolchain-name>.tar.bz2。
+
+## 设置环境变量
+
+运行上面make-standalone-toolchain.sh命令创建工具链之后，再：
+```shell
+$ export PATH=/tmp/my-android-toolchain/bin:$PATH
+$ export CC=arm-linux-androideabi-gcc
+$ export CXX=arm-linux-androideabi-g++
+$ export CXXFLAGS="-lstdc++"
+```
+
+##使用make
+
+执行完以上设置环境变量的命令之后，就可以直接编译了（例如，执行 ./configure 然后 make 得到的就是 arm 程序了）。不用再设定 sysroot, CC 了。而且，可以使用 STL，异常，RTTI。
+
+
+## make-standalone-toolchain.sh --help 查看帮助
+```shell
+$ /cygdrive/f/Android/android-ndk-r10/build/tools/make-standalone-toolchain.sh --help
+
+Usage: make-standalone-toolchain.sh [options]
+
+Generate a customized Android toolchain installation that includes
+a working sysroot. The result is something that can more easily be
+used as a standalone cross-compiler, e.g. to run configure and
+make scripts.
+
+Valid options (defaults are in brackets):
+
+  --help                   Print this help.
+  --verbose                Enable verbose mode.
+  --toolchain=<name>       Specify toolchain name
+  --llvm-version=<ver>     Specify LLVM version
+  --stl=<name>             Specify C++ STL [gnustl]
+  --arch=<name>            Specify target architecture
+  --abis=<list>            Specify list of target ABIs.
+  --ndk-dir=<path>         Take source files from NDK at <path> [/cygdrive/f/Android/android-ndk-r10]
+  --system=<name>          Specify host system [windows]
+  --package-dir=<path>     Place package file in <path> [/tmp/ndk-fangss]
+  --install-dir=<path>     Don't create package, install files to <path> instead.
+  --platform=<name>        Specify target Android platform/API level. [android-3]
+```
+
+## Windows支持
+Windows上的NDK工具链不依赖 Cygwin，但是这些工具不能理解Cygwin的路径名（例如，/cygdrive/c/foo/bar）。只能理解C:/cygdrive/c/foo/bar这类路径。不过，NDK 提供的build工具能够很好地应对上述问题（ndk-build）。
+
