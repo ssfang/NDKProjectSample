@@ -24,7 +24,7 @@ Android NDK: Could not find application project directory !
 Android NDK: Please define the NDK_PROJECT_PATH variable to point to it.    
 /opt/android-ndk-r10b/build/core/build-local.mk:148: *** Android NDK: Aborting    .  Stop.
 ```
-*answer
+* answer
 ```
 You need to specify 3 things.
 NDK_PROJECT_PATH - the location of your project
@@ -59,3 +59,73 @@ VistualGDB
 * Rebuild command line: ndk-build -B NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
 * Include search path: E:\Android\android-ndk-r9d\platforms\android-12\arch-arm\usr\include // 对应到你本机的目录及版本。
 点击完成。
+
+#使用makefile的库
+
+一般Android写c/c++的NDK使用Android.mk。当使用其他开源库时，大多是通过Makefile编译的，而又可能再使用其它开源库，如果在写Android.mk会很麻烦。虽然一些可以在AOSP中可以找到。这些其实和toolchain有关。故可以独立出一个toolchain，直接使用Makefile，而不需要自己去重新编写Android.mk文件，减少了很多麻烦。
+
+从Android NDK中独立toolchain步骤（系统为Ubuntu(32位)）：
+
+下载Android NDK
+独立toolchain
+
+把NDK压缩包解压到系统，如/mnt目录下，后在/mnt目录下建立文件夹my_ndk_toolchain，然后再/mnt目录下执行以下命令：
+
+/mnt/android-ndk-r9c/build/tools/make-standalone-toolchain.sh --platform=android-19 --toolchain=arm-linux-androideabi-4.8 --stl=stlport --install-dir=/mnt/my_ndk_toolchain
+
+出现以下打印：
+
+dir=/mnt/my_ndk_toolchain  
+Copying prebuilt binaries...  
+Copying sysroot headers and libraries...  
+Copying libstdc++ headers and libraries...  
+Copying files to: /mnt/my_ndk_toolchain  
+Cleaning up...  
+Done.  
+
+说明独立的工具链成功，对执行的命令进行简单说明：
+```
+/mnt/android-ndk-r9c/build/tools/make-standalone-toolchain.sh：执行NDK目录下make-standalone-toolchain.sh脚本；
+--platform：指工具链将使用哪个版本的Android API，可cd /mnt/android-ndk-r9c/platform中查看，我这里使用的是Android-19；
+--toolchain:指独立出来的工具链哪种用途的编译，arm(arm-linux-androideabi-4.8),X86(x86-4.8)或MIPS(mipsel-linux-android-4.8)，可cd toolchains中查看并选择适合的类型，我这里使用的是嵌入式；
+--stl:指工具链支持C++ stl，stlport代表C++库将静态链接，stlport_shared将动态链接；
+--install-dir:指安装目录；
+注意：因为我使用的是32-bit Ubuntu，独立工具链默认是32位，所以在参数中没有指定系统类型，如果是64-bit Linux系统，需加入--system=linux-x86_64 或MacOSX加入--system=darwin-x86_64。
+```
+
+3、测试程序
+```c++
+hello.cpp
+#include <iostream>
+#include <string>
+int main(int argc, char **argv)
+{
+    std::string str = "hello, ndk! this is my own toolchain! ^-^";
+    std::cout << str << std::endl;
+    return 0;
+}
+```
+Makefile
+```makefile
+rm=/bin/rm -f
+CC=/mnt/my_ndk_toolchain/bin/arm-linux-androideabi-g++
+PROGNAME = main
+INCLUDES= -I.
+CFLAGS  = $(INCLUDES) -g -fPIC -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE
+OBJS   = hello.o
+LDFLAGS =
+all :$(PROGNAME)
+%.o: %.cpp
+        $(CC) $(CFLAGS) -c -o $@ $<
+$(PROGNAME) : $(OBJS)
+        @echo  "Linking $(PROGNAME)......"
+        ${CC} ${LDFLAGS} -o ${PROGNAME} ${OBJS}
+        @echo  "Linking Success!"
+clean:
+        $(rm) *.o  $(PROGNAME)
+```
+编译后得到可执行文件:main，adb push到嵌入式Android平台后，./main运行，得到以下结果：
+```shell
+root@android :/data # ./main                                                
+hello, ndk! this is my own toolchain! ^-^
+```
