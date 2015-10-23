@@ -44,6 +44,8 @@ VistualGDB
 
 #VS+VA
 
+(参考)[http://bbs.pediy.com/showthread.php?p=1353066]
+
 打开VS2008，新建Makefile项目
 
 环境变量：
