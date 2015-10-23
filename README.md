@@ -132,10 +132,35 @@ hello, ndk! this is my own toolchain! ^-^
 ```
 
 
-#NDK编译器
+#NDK
 
-1. 创建工具链
+##Android NDK 工具链的使用方法（Standalone Toolchain）
+[来自](http://blog.csdn.net/smfwuxiao/article/details/6587709)
 
+首先需要确定目标机器的指令集。
+
+如果是 x86 的机器，用 x86-4.4.3 版本的工具链；如果是 arm 指令的，用 arm-linux-androideabi-4.4.3 版本 (x86-4.4.3 和 arm-linux-androideabi-4.4.3 位于ndk目录中)
+
+1、gcc的sysroot 选项
+
+sysroot选项设定 gcc 在编译源码的时候，寻找头文件和库文件的根目录。可以这样调用 gcc --sysroot=/tmp/gcc-arm (及其他选项)。NDK 根目录下的 platforms 目录中的各个子目录的路径都可以直接传给 gcc --sysroot=<dir>。为了简化操作，可以在linux系统的命令终端执行以下命令，设置SYSROOT环境变量，$NDK是ndk的根目录。
+
+$ SYSROOT=$NDK/platforms/android-8/arch-arm
+
+2、调用 NDK gcc（第1种方法）。
+ 
+设置SYSROOT之后，要把它传给 gcc 的--sysroot选项。由于unix/linux自带的gcc并非交叉编译工具，而我们需要使用的是ndk中提供的交叉编译工具（也是gcc），所以需要想办法让编译脚本找到ndk中的gcc，而不要去寻找系统中的gcc。而 unix/linux 系统的编译脚本常常会用 CC 环境变量来引用编译器，所以通过把 CC设置为ndk中的gcc的路径，就能帮助编译脚本找到正确的gcc（我们还能顺便加上--sysroot选项）。
+
+将CC 按如下设置
+
+$ export CC="$NDK/toolchains/<name>/prebuilt/<host-system>/bin/<prefix>gcc --sysroot=$SYSROOT"  
+$ $CC -o foo.o -c foo.c  (不必执行这一行，这条命令是调用gcc编译程序）
+
+上面第1行之后之后，再去执行./configure 就可以编译出arm程序了。不过还需要考虑共享库的链接问题，要确保该程序没有链接ndk未提供的共享库。该方法的缺陷就是，不能使用 C++ STL（STLport 或 GNU libstdc++ ），也不能使用异常机制和RTTI。
+
+### 调用NDK编译器（第2种方法，更简单）
+
+1. 创建工具链  
 android ndk提供脚本，允许自己定制一套工具链。例如：
 
 $NDK/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir=/tmp/my-android-toolchain [ --arch=x86 ]
@@ -143,8 +168,7 @@ $NDK/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir
 将会在/tmp/my-android-toolchain 中创建 sysroot 环境和 工具链。--arch 选项选择目标程序的指令架构，默认是为 arm。
 如果不加 --install-dir 选项，则会创建 /tmp/ndk/<toolchain-name>.tar.bz2。
 
-2. 设置环境变量
-
+2. 设置环境变量  
 运行上面make-standalone-toolchain.sh命令创建工具链之后，再：
 ```shell
 $ export PATH=/tmp/my-android-toolchain/bin:$PATH
@@ -153,11 +177,10 @@ $ export CXX=arm-linux-androideabi-g++
 $ export CXXFLAGS="-lstdc++"
 ```
 
-3. 使用make
-
+3. 使用make  
 执行完以上设置环境变量的命令之后，就可以直接编译了（例如，执行 ./configure 然后 make 得到的就是 arm 程序了）。不用再设定 sysroot, CC 了。而且，可以使用 STL，异常，RTTI。
 
-4. make-standalone-toolchain.sh --help 查看帮助
+4. make-standalone-toolchain.sh --help 查看帮助  
 ```shell
 $ /cygdrive/f/Android/android-ndk-r10/build/tools/make-standalone-toolchain.sh --help
 
@@ -184,6 +207,7 @@ Valid options (defaults are in brackets):
   --platform=<name>        Specify target Android platform/API level. [android-3]
 ```
 
+* NDK自带工具链
 
 比如，android-ndk-r10自带的工具链，我这里在F:\Android\android-ndk-r10\toolchains目录下：
 ```shell
@@ -207,6 +231,8 @@ d---------+ 1 fangss None 0 Dec  9  2014 x86-clang3.3
 d---------+ 1 fangss None 0 Dec  9  2014 x86-clang3.4
 ```
 [OUTPUT TRUNCATED]
+
+* 事例
 
 现在我们自己创建，在Cygwin下执行make-standalone-toolchain.sh，如果出现如下权限问题，可以右键管理员身份运行Cygwin。
 ```shell
@@ -250,7 +276,6 @@ Done.
 * strings ：打印出目标文件中可以打印的字符串，有个默认的长度，为4
 * strip   ：剥掉目标文件的所有的符号信息
 
-
 之后就可以使用了，还可配置如下环境
 
 ```shell
@@ -262,14 +287,16 @@ export LD=arm-linux-androideabi-ld
 ```
 
 再就是可以编译第三方库，如libpcap
+```shell
 cd libpcap-1.7.4
 ./configure --host=arm-linux --with-pcap=~/tcpdump/libpcap-1.7.4 ac_cv_linux_vers=2
 make
+```
 
+## 警告 & 限制
 
-# Windows支持
-
-Windows上的NDK工具链不依赖 Cygwin，但是这些工具不能理解Cygwin的路径名（例如，/cygdrive/c/foo/bar）。只能理解C:/cygdrive/c/foo/bar这类路径。不过，NDK 提供的build工具能够很好地应对上述问题（ndk-build）。
+5.1 Windows支持
+Windows上的NDK工具链不依赖Cygwin，但是这些工具不能理解Cygwin的路径名（例如，/cygdrive/c/foo/bar）。只能理解C:/cygdrive/c/foo/bar这类路径。不过，NDK 提供的build工具能够很好地应对上述问题（ndk-build）。
 
 5.2 wchar_t 支持  
 wchar_t  类型仅从 Android 2.3 开始支持。在 android-9 上， wchar_t 是 4字节。 并且 C语言库提供支持宽字符的函数（例外：multi-byte 编码/解码 函数 和 wsprintf/wsscanf ）在android-9 以前的平台上，wchar_t 是1字节，而且宽字符函数不起作用。建议不使用 wchar_t，提供 wchar_t 支持是为了方便移植以前的代码。
