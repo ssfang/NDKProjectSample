@@ -12,6 +12,7 @@
 7. OK.
 
 $ ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
+
 NDK_PROJECT_PATH 指定了需要编译的代码的工程目录，这里给出的是当前目录，APP_BUILD_SCRIPT给出的是Android makefile文件的路径，当然，如果你还有 Application.mk 文件的话，则可以添加 NDK_APP_APPLICATION_MK=./Application.mk 
 
 
@@ -38,3 +39,21 @@ ndk-build NDK_PROJECT_PATH=/path/to/proj NDK_APPLICATION_MK=/path/to/Application
 In Application.mk add
 APP_BUILD_SCRIPT := /path/to/Android.mk
 ```
+
+VistualGDB
+
+#VS+VA
+
+打开VS2008，新建Makefile项目
+
+环境变量：
+
+将NDK根目录加入%PATH%环境变量，这样直接使用命令ndk-build。
+
+在项目向导中填写以下内容
+
+* Build command line: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
+* Clean commands: ndk-build clean NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
+* Rebuild command line: ndk-build -B NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
+* Include search path: E:\Android\android-ndk-r9d\platforms\android-12\arch-arm\usr\include // 对应到你本机的目录及版本。
+点击完成。
