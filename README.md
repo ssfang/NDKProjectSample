@@ -276,6 +276,49 @@ Done.
 * strings ：打印出目标文件中可以打印的字符串，有个默认的长度，为4
 * strip   ：剥掉目标文件的所有的符号信息
 
+
+其中strip使用事例如下：
+
+当编译tcpdump时，文件可能比较大，可以使用strip来去掉符号，可减少体积40%。
+参考(Monitoring Android Network Traffic Part II: Cross Compiling TCPDUMP)[http://www.symantec.com/connect/blogs/monitoring-android-network-traffic-part-ii-cross-compiling-tcpdump]
+(-fPIE -pie编译tcpdump)[http://www.liudonghua.com/?p=372]
+
+```shell
+mkdir ~/tcpdump
+cd ~/tcpdump
+wget http://www.tcpdump.org/release/libpcap-1.6.2.tar.gz
+wget http://www.tcpdump.org/release/tcpdump-4.6.2.tar.gz
+tar -xzvf libpcap-1.6.2.tar.gz
+tar -xzvf tcpdump-4.6.2.tar.gz
+mkdir toolchain
+%NDK_HOME%/build/tools/make-standalone-toolchain.sh --platform=android-21 --install-dir=~/tcpdump/toolchain
+export PATH=~/tcpdump/toolchain/bin:$PATH
+export CC=arm-linux-androideabi-gcc
+export RANLIB=arm-linux-androideabi-ranlib
+export AR=arm-linux-androideabi-ar
+export LD=arm-linux-androideabi-ld
+cd libpcap-1.6.2
+./configure --host=arm-linux --with-pcap=~/tcpdump/libpcap-1.6.2 ac_cv_linux_vers=2
+make
+cd ../tcpdump-4.6.2
+sed -i".bak" "s/setprotoent/\/\/setprotoent/g" print-isakmp.c
+sed -i".bak" "s/endprotoent/\/\/endprotoent/g" print-isakmp.c
+./configure --host=arm-linux --with-pcap=linux --with-crypto=no ac_cv_linux_vers=2 --disable-ipv6
+vi Makefile # 在CFLAGS、LDFLAGS中添加"-fPIE -pie"
+make # 或者不用做上面那一步，使用make CFLAGS="-DNBBY=8 -fPIE -pie"
+# 最后编译完之后在根目录下即有tcpdump
+file tcpdump
+tcpdump: ELF 32-bit LSB  shared object, ARM, EABI5 version 1 (SYSV), dynamically linked (uses shared libs), not stripped
+```
+相应的strip命令
+```shell
+root@debian $ ls -lh tcpdump
+-rwx------ 1 root root 2.8M Aug 18 20:49 tcpdump
+root@debian $ arm-linux-gnueabi-strip tcpdump
+root@debian $ ls -lh tcpdump
+-rwx------ 1 root root 1.5M Aug 18 20:50 tcpdump
+```
+
 之后就可以使用了，还可配置如下环境
 
 ```shell
