@@ -40,6 +40,35 @@ In Application.mk add
 APP_BUILD_SCRIPT := /path/to/Android.mk
 ```
 
+include $(call all-makefiles-under,$(LOCAL_PATH)) 对$(LOCAL_PATH)指定目录下所有子孙目录的Android.mk  
+include $(call all-subdir-under) 对当前目录下所有一级子目录Android.mk（如果没有类似递归语法）  
+
+[源码](http://androidxref.com/4.2_r1/xref/ndk/build/core/definitions.mk)
+```mk
+# -----------------------------------------------------------------------------
+# Macro    : my-dir
+# Returns  : the directory of the current Makefile
+# Usage    : $(my-dir)
+# -----------------------------------------------------------------------------
+my-dir = $(call parent-dir,$(lastword $(MAKEFILE_LIST)))
+
+# -----------------------------------------------------------------------------
+# Function : all-makefiles-under
+# Arguments: 1: directory path
+# Returns  : a list of all makefiles immediately below some directory
+# Usage    : $(call all-makefiles-under, <some path>)
+# -----------------------------------------------------------------------------
+all-makefiles-under = $(wildcard $1/*/Android.mk)
+
+# -----------------------------------------------------------------------------
+# Macro    : all-subdir-makefiles
+# Returns  : list of all makefiles in subdirectories of the current Makefile's
+#            location
+# Usage    : $(all-subdir-makefiles)
+# -----------------------------------------------------------------------------
+all-subdir-makefiles = $(call all-makefiles-under,$(call my-dir))
+```
+
 VistualGDB
 
 #VS+VA
