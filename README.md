@@ -15,7 +15,6 @@ $ ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk
 
 NDK_PROJECT_PATH 指定了需要编译的代码的工程目录，这里给出的是当前目录，APP_BUILD_SCRIPT给出的是Android makefile文件的路径，当然，如果你还有 Application.mk 文件的话，则可以添加 NDK_APP_APPLICATION_MK=./Application.mk 
 
-
 # a ndk-build problem
 * question
 ```
@@ -159,6 +158,41 @@ clean:
 root@android :/data # ./main                                                
 hello, ndk! this is my own toolchain! ^-^
 ```
+
+# HOWTO Cross compiling on Android
+[摘自](https://gist.github.com/Tydus/11109634#file-howto-standalone-toolchain-md)
+# 5W1H
+## What is NDK
+NDK (Native Develop Toolkit) is a toolchain from Android official, originally for users who writes native C/C++ code as JNI library. It's not designed for compiling standalone programs (./a.out) and not compatible with automake/cmake etc.
+## What is Standalone Toolchain
+"Standalone" refers to two meanings:  
+1. The program is standalone (has nothing connect to NDK, and don't need helper scripts to run it)  
+2. The toolchain is made for building standalone programs and libs, and which can used by automake etc.
+## (Optional) Why NDK is hard to use
+By default, NDK uses android flavor directory structure when it's finding headers and libs, which is different from GNU flavor, so the compiler cannot find them. For Example:
+```
+/home/tyeken8/Desktop/elab/geo/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld: error: cannot open crtbegin_dynamic.o: No such file or directory
+/home/tyeken8/Desktop/elab/geo/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld: error: cannot open crtend_android.o: No such file or directory
+/home/tyeken8/Desktop/elab/geo/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld: error: cannot find -lc
+/home/tyeken8/Desktop/elab/geo/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld: error: cannot find -ldl
+collect2: error: ld returned 1 exit status
+```  
+Although we can manuall specify the path (someone wrote a program called "agcc" to handle this automatically, but still not good), it's really annoying.
+# Howto
+1. Download Android NDK  
+    from https://developer.android.com/tools/sdk/ndk/index.html
+2. Extract the NDK  
+    `tar xf android-ndk-r9d-*.tar.bz2 && cd android-ndk-r9d`
+3. Make GNU Android Toolchain from NDK  
+    `build/tools/make-standalone-toolchain.sh --toolchain=arm-linux-androideabi-4.8 --platform=android-19 --install-dir=../toolchain`
+4. Delete the NDK (Yes, we don't need it any more)  
+    `cd .. && rm -rf android-ndk-r9d`
+5. Test the native toolchain  
+    `cd toolchain/bin`  
+    `echo "main(){}" | ./arm-linux-androideabi-gcc -x c - `  
+    `file a.out # a.out: ELF 32-bit LSB executable, ARM, version 1 (SYSV), dynamically linked (uses shared libs), not stripped`
+6. (Optional) Now you can use it as a standard GNU toolchain  
+    For example: `./configure --prefix=/opt/android --host=arm-linux-androideabi && make && make install`
 
 
 #NDK
