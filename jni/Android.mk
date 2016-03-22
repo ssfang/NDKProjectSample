@@ -1,4 +1,4 @@
-# ÕâÊÇÒ»¸ö¶¥¼¶Android.mkÊéĞ´¾ÙÀı
+# è¿™æ˜¯ä¸€ä¸ªé¡¶çº§Android.mkä¹¦å†™ä¸¾ä¾‹
 
 LOCAL_PATH := $(call my-dir)
 
@@ -10,30 +10,30 @@ LOCAL_PATH := $(call my-dir)
 
 # https://www.gnu.org/software/make/manual/html_node/Text-Functions.html
 # http://wiki.ubuntu.org.cn/index.php?title=%E8%B7%9F%E6%88%91%E4%B8%80%E8%B5%B7%E5%86%99Makefile:%E4%BD%BF%E7%94%A8%E5%87%BD%E6%95%B0&variant=zh-hans
-# $(notdir <names...>)È¡ÎÄ¼şº¯Êı ´ÓÎÄ¼şÃûĞòÁĞ<names>ÖĞÈ¡³ö·ÇÄ¿Â¼²¿·Ö¡£·ÇÄ¿Â¼²¿·ÖÊÇÖ¸×îºóÒ»¸ö·´Ğ±¸Ü£¨¡°/¡±£©Ö®ºóµÄ²¿·Ö¡£
-# $(patsubst <pattern>,<replacement>,<text>)Ä£Ê½×Ö·û´®Ìæ»»º¯Êı  
-# $(strip <string>)È¥¿Õ¸ñº¯Êı È¥µô<string>;×Ö´®ÖĞ¿ªÍ·ºÍ½áÎ²µÄ¿Õ×Ö·û¡£
+# $(notdir <names...>)å–æ–‡ä»¶å‡½æ•° ä»æ–‡ä»¶ååºåˆ—<names>ä¸­å–å‡ºéç›®å½•éƒ¨åˆ†ã€‚éç›®å½•éƒ¨åˆ†æ˜¯æŒ‡æœ€åä¸€ä¸ªåæ–œæ ï¼ˆâ€œ/â€ï¼‰ä¹‹åçš„éƒ¨åˆ†ã€‚
+# $(patsubst <pattern>,<replacement>,<text>)æ¨¡å¼å­—ç¬¦ä¸²æ›¿æ¢å‡½æ•°  
+# $(strip <string>)å»ç©ºæ ¼å‡½æ•° å»æ‰<string>;å­—ä¸²ä¸­å¼€å¤´å’Œç»“å°¾çš„ç©ºå­—ç¬¦ã€‚
 
-#¶ÔÓÚ±íÊ¾Â·¾¶µÄÃû×Ö£¬ÒÔPATHºó×º²»´ø£¨·´£©Ğ±¸Ü£¬DIRÔò´ø£¨·´£©Ğ±¸Ü
+#å¯¹äºè¡¨ç¤ºè·¯å¾„çš„åå­—ï¼Œä»¥PATHåç¼€ä¸å¸¦ï¼ˆåï¼‰æ–œæ ï¼ŒDIRåˆ™å¸¦ï¼ˆåï¼‰æ–œæ 
 
-mkfile_path := $(strip $(abspath $(lastword $(MAKEFILE_LIST)))) #È¡³öµ±Ç°makefileµÄÂ·¾¶£¬²¢ÇÒÊÇ¾ø¶ÔÂ·¾¶
-current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path)))) #patsubstÒ»¾ä±íÊ¾È¥Î²²¿Ğ±¸Ü£¬%ÊÇÈÎÒâ³¤¶ÈÍ¨Åä·û
+mkfile_path := $(strip $(abspath $(lastword $(MAKEFILE_LIST)))) #å–å‡ºå½“å‰makefileçš„è·¯å¾„ï¼Œå¹¶ä¸”æ˜¯ç»å¯¹è·¯å¾„
+current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path)))) #patsubstä¸€å¥è¡¨ç¤ºå»å°¾éƒ¨æ–œæ ï¼Œ%æ˜¯ä»»æ„é•¿åº¦é€šé…ç¬¦
 
 TOP_ABS_DIR :=$(dir $(mkfile_path))
-TOP_ABS_PATH :=$(patsubst %/,%,$(TOP_ABS_DIR)) #ÔÚÏÂÃæ´òÓ¡ÖĞ½áÎ²»á³öÏÖ¿Õ¸ñ£¬²»Ã÷
+TOP_ABS_PATH :=$(patsubst %/,%,$(TOP_ABS_DIR)) #åœ¨ä¸‹é¢æ‰“å°ä¸­ç»“å°¾ä¼šå‡ºç°ç©ºæ ¼ï¼Œä¸æ˜
 
 ifeq ($(PRINT_PATH), 1)
  #print a info about the current dir, maybe a relative path, such as "jni"
  $(info [^-^] LOCAL_PATH = "$(LOCAL_PATH)")
- $(info [^-^] mkfile_path = "$(mkfile_path)") #ÉÏÃæ²»ÖªÎªºÎ½áÎ²´ø¿Õ¸ñ£¬strip²»µô
+ $(info [^-^] mkfile_path = "$(mkfile_path)") #ä¸Šé¢ä¸çŸ¥ä¸ºä½•ç»“å°¾å¸¦ç©ºæ ¼ï¼Œstripä¸æ‰
  $(info [^-^] current_absolute_direcory_with_last_slash = "$(TOP_ABS_DIR)") # OK
- $(info [^-^] current_absolute_direcory_without_last_slash = "$(TOP_ABS_PATH)") #Î²¿Õ¸ñ
+ $(info [^-^] current_absolute_direcory_without_last_slash = "$(TOP_ABS_PATH)") #å°¾ç©ºæ ¼
 endif
 
 ifdef USE_UNDISTRIBUTED
   UNDISTRIBUTED_C_INCLUDES := $(LOCAL_PATH)/undistributed/include
   UNDISTRIBUTED_LDLIBS := $(TOP_ABS_DIR)undistributed/lib/$(TARGET_ARCH)
-  $(info ^-^ UNDISTRIBUTED_LDLIBS = $(UNDISTRIBUTED_LDLIBS))
+  $(info [^-^] UNDISTRIBUTED_LDLIBS = $(UNDISTRIBUTED_LDLIBS))
 endif
 
 #################################################################
@@ -54,22 +54,23 @@ endif
 # Include makefiles here. Its important that these includes are 
 # done after the main module, explanation below.
 
-#×¢Òâ£¬Èç¹ûÆäËûmkÎÄ¼şÒ²Ê¹ÓÃLOCAL_PATH£¬ÊÇ¹²ÏíµÄ
+#æ³¨æ„ï¼Œå¦‚æœå…¶ä»–mkæ–‡ä»¶ä¹Ÿä½¿ç”¨LOCAL_PATHï¼Œæ˜¯å…±äº«çš„
 # create a temp variable with the current path, because it changes
 # after each include
 TOP_LOCAL_PATH := $(LOCAL_PATH)
 
-#include $(TOP_LOCAL_PATH)/HelloWorld/Android.mk
+include $(TOP_LOCAL_PATH)/HelloWorld/Android.mk
 #include $(TOP_LOCAL_PATH)/MessagePack/Android.mk
 #include $(TOP_LOCAL_PATH)/toy/Android.mk
 
-LOCAL_PATH = $(TOP_LOCAL_PATH) ## restore it
-
-# I want only second-level mk files, that is the direct sub-directories
-# in the current path.
-include $(wildcard */*/Android.mk)
+## I want only second-level mk files, that is the direct sub-directories
+## in the current path.
+# include $(wildcard */*/Android.mk)
 # include $(call all-subdir-makefiles)  ## $(wildcard $(call my-dir)/*/Android.mk)
 # include $(call all-makefiles-under,$(LOCAL_PATH))
+
+LOCAL_PATH = $(TOP_LOCAL_PATH) ## restore it
+
 
 #################################################################
 # print test (first, "cd project_path", then, "ndk-build")      
@@ -77,7 +78,7 @@ include $(wildcard */*/Android.mk)
 
 # I dunno why it's an empty result for $(call all-subdir-makefiles).
 ifdef PRINT_TEST
-  # $(info [^-^ print-test] all-subdir-makefiles = "$(call all-subdir-makefiles) ")
+  # $(info [print-test] all-subdir-makefiles = "$(call all-subdir-makefiles) ")
   $(info [print-test] "$(wildcard $(TOP_ABS_DIR)*/Android.mk)") # print: xx/project_path/jni/xxdir/Android.mk
   $(info [print-test] assert "jni/Android.mk" = "$(wildcard */Android.mk)") # print: jni/Android.mk
   $(info [print-test] $$(wildcard */*/Android.mk) = "$(wildcard */*/Android.mk)") # print: jni/xxdir/Android.mk
@@ -95,10 +96,10 @@ endif
 # LOCAL_C_INCLUDES := $(LOCAL_C_INCLUDES:$(LOCAL_PATH)/%:=$(LOCAL_PATH)/%)
 
 # 
-# ²é¿´¶ş½øÖÆµÄ¿âÒÀÀµ
-# arm-linux-readelf -d libc.so ´òÓ¡Dynamic section£¬ÆäÖĞ´øÓĞ[NEEDED] Shared libraryĞĞ
+# æŸ¥çœ‹äºŒè¿›åˆ¶çš„åº“ä¾èµ–
+# arm-linux-readelf -d libc.so æ‰“å°Dynamic sectionï¼Œå…¶ä¸­å¸¦æœ‰[NEEDED] Shared libraryè¡Œ
 
-# ²é¿´·ûºÅ
-# readelf -s libcutils.so ´òÓ¡Symbol table '.dynsym'µÈ
+# æŸ¥çœ‹ç¬¦å·
+# readelf -s libcutils.so æ‰“å°Symbol table '.dynsym'ç­‰
 # nm -D libcutils.so
-# objdump -tT libcutils.so ´òÓ¡SYMBOL TABLEºÍDYNAMIC SYMBOL TABLE
+# objdump -tT libcutils.so æ‰“å°SYMBOL TABLEå’ŒDYNAMIC SYMBOL TABLE
