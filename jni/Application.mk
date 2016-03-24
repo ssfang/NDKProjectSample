@@ -5,7 +5,13 @@
 APP_PLATFORM := android-10
 APP_ABI = armeabi armeabi-v7a x86  # APP_ABI := all
 
-# APP_STL := stlport_static
+LOCAL_CPP_FEATURES := # empty exceptions
+
+## By APP_STL, the NDK toolchain will correctly tell the linker what lib to use, no need LOCAL_LDLIBS in Android.mk.
+APP_STL := c++_static # libc++ : c++_static or c++_shared
+ # APP_STL := stlport_static # stlport_static is poor to support c++11, such as std::tuple
+ # APP_STL := gnustl_static
+ # APP_GNUSTL_FORCE_CPP_FEATURES := # empty (enum{ exceptions rtti })
 
 # Enable c++11 extentions in source code for all
 # http://stackoverflow.com/questions/15616254/enable-c11-support-on-android
@@ -82,10 +88,13 @@ APP_ABI = armeabi armeabi-v7a x86  # APP_ABI := all
 #######################################################
 # Latest C++11 features with Android NDK
 #######################################################
-# (I'm addressing the NDK version r9b) To enable C++11 support for all source code of the application (and so any modules included) make the following change in the Application.mk:
+# (I'm addressing the NDK version r9b) To enable C++11 support for all source code of the 
+# application (and so any modules included) make the following change in the Application.mk:
 # 
 # # use this to select gcc instead of clang
 # NDK_TOOLCHAIN_VERSION := 4.8
+# # NDK revision 10 has the Clang 3.6 toolchain. Use it:
+# NDK_TOOLCHAIN_VERSION := clang3.6
 # # OR use this to select the latest clang version:
 # NDK_TOOLCHAIN_VERSION := clang
 # 
@@ -93,7 +102,13 @@ APP_ABI = armeabi armeabi-v7a x86  # APP_ABI := all
 # # then enable c++11 extentions in source code
 # APP_CPPFLAGS += -std=c++11
 # # or use APP_CPPFLAGS := -std=gnu++11
-# Otherwise, if you wish to have C++11 support only in your module, add this lines into your Android.mk instead of use APP_CPPFLAGS
+# Otherwise, if you wish to have C++11 support only in your module, add this lines into your
+# Android.mk instead of use APP_CPPFLAGS
 # 
 # LOCAL_CPPFLAGS += -std=c++11
+#
 # Read more here: http://adec.altervista.org/blog/ndk_c11_support/
+# 
+# See http://stackoverflow.com/questions/25970252/build-android-with-clang-instead-of-gcc-and-the-clang-stl-lib-instead-of-gnust
+# See http://libcxx.llvm.org/, which says libc++ is a new implementation of the C++ standard 
+# library, targeting C++11.

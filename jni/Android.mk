@@ -5,6 +5,8 @@ LOCAL_PATH := $(call my-dir)
 # PRINT_TEST := 0
 # PRINT_PATH := 0
 
+$(info [^-^] TOOLCHAIN_VERSION = "$(TOOLCHAIN_VERSION)")
+ 
 #http://stackoverflow.com/questions/18136918/how-to-get-current-directory-of-your-makefile
 #Code below will work for any for Makefiles invoked from any directory:
 

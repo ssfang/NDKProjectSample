@@ -42,25 +42,30 @@
 > The ndk include paths should now be correct including include paths
 > defined in android.mk files.
 
-这个可以，配个图如下：
-对比Windows的本地c++程序的配置
+这个可以，配个图如下：  
+对比Windows的本地c++程序的配置  
 ![win_cpp_project_properties_ToolChainEditor.png](./win_cpp_project_properties_ToolChainEditor.png)
 ![win_cpp_project_properties_DiscoveryOptions.png](./win_cpp_project_properties_DiscoveryOptions.png)
 ![win_cpp_project_properties_PathsAndSymbols.png](./win_cpp_project_properties_PathsAndSymbols.png)
-![win_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc.png](./win_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc.png)
-Android的
+![win_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc.png](./win_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc.png)  
+Android的  
 ![Android_cpp_project_properties_PathsAndSymbols.png](./Android_cpp_project_properties_PathsAndSymbols.png)
 ![Android_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc.png](./Android_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc.png)
-改变一下，将下图
+改变一下，将下图  
 ![EclipseCDT_PropertiesForCppProject_ToolChainEditor.png](./EclipseCDT_PropertiesForCppProject_ToolChainEditor.png)
-改为下图模样
-![EclipseCDT_PropertiesForCppProject_ToolChainEditor2.png](./EclipseCDT_PropertiesForCppProject_ToolChainEditor2.png)
-应用后，Paths And Symbols面板内的内容会变成Cygwin C Compiler和Cygwin C++ Compiler工具链的默认路径了。这时要确保发现路径的位置是NDK里的，需要配置一下Discovery Options面板里的选项为androidPerProjectProfile，这对CDT8.1版本也适用，它会配置好Include等路径的。
-![Android_cpp_project_properties_DiscoveryOptions.png](./Android_cpp_project_properties_DiscoveryOptions.png)
-之后，Paths And Symbols面板里的就好了：
-![win_cpp_project_properties_PathsAndSymbols.png](./win_cpp_project_properties_PathsAndSymbols.png)
-而Preprocessor Include Paths, Macros, etc也呈现良好的结果：
-![win_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc2.png](./win_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc2.png)
+改为下图模样  
+![EclipseCDT_PropertiesForCppProject_ToolChainEditor2.png](./EclipseCDT_PropertiesForCppProject_ToolChainEditor2.png)  
+
+应用后，Paths And Symbols面板内的内容会变成Cygwin C Compiler和Cygwin C++ Compiler工具链的默认路径了。如下图：  
+![win_cpp_project_properties_PathsAndSymbols.png](./win_cpp_project_properties_PathsAndSymbols.png)  
+这时要确保发现路径的位置是NDK里的，需要配置一下Discovery Options面板里的选项为 androidPerProjectProfile，这对CDT8.1版本也适用，它会配置好Include等路径的。  
+![Android_cpp_project_properties_DiscoveryOptions.png](./Android_cpp_project_properties_DiscoveryOptions.png)  
+之后，Paths And Symbols面板里的就好了：  
+![Android_cpp_project_properties_PathsAndSymbols.png](./Android_cpp_project_properties_PathsAndSymbols.png)  
+而Preprocessor Include Paths, Macros, etc也呈现良好的结果：  
+![Android_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc2.png](./Android_cpp_project_properties_PreprocessorIncludePaths,MacrosEtc2.png)
+
+最后也许还需要重建索引：Projects -> C/C++ Index -> Rebuild。如果Include不对还可以通过 Discovery Options 面板（就是选择androidPerProjectProfile的那里）里点击Clear按钮清除。
 
 @see [Eclipse/ADT plugin cannot locate symbols for r10d NDK](https://code.google.com/p/android/issues/detail?id=97023)
 指出，r10e可以。
