@@ -9,9 +9,18 @@
 #include <bitset>
 #include <algorithm>    // std::sort
 
-//#include <tuple>
+#include <tuple>
 
 #define __GXX_EXPERIMENTAL_CXX0X__ 1
+
+#if __cplusplus >= 201103L
+	#pragma message "C++ ISO/IEC 14882:2011 supported by the compiler (informally known as C++ 11)"
+#elif __cplusplus >= 199711L
+	#pragma message "C++ ISO/IEC 14882:1998 supported by the compiler"
+#else
+	/* #error No C++ support */
+	/* static_assert(false,"__cplusplus is less than or equal to 199711L") */
+#endif
 
 template<class T, const size_t N>
 class Array {
@@ -67,7 +76,6 @@ int main(int argc, const char *argv[]) {
 	printf("capacity: %d\n", str.capacity());
 	printf("max_size: %u\n", str.max_size());
 
-
 	str.append("shanshan");
 	printf("find_first_of: %d\n", str.find_first_of("an"));
 	printf("find_first_not_of: %d\n", str.find_first_not_of("fang"));
@@ -98,8 +106,8 @@ int main(int argc, const char *argv[]) {
 		printf(" %d", *it);
 	printf("\n");
 
-	int myints[] = {32,71,12,45,26,80,53,33};
-	std::sort (myints, myints+4);
+	int myints[] = { 32, 71, 12, 45, 26, 80, 53, 33 };
+	std::sort(myints, myints + 4);
 
 	for (auto& x : myvector)
 		printf(" %d", x);
@@ -113,7 +121,6 @@ int main(int argc, const char *argv[]) {
 	printf("mylist.size() = %d, mylist.max_size() = %u\n", mylist.size(),
 			mylist.max_size());
 	mylist.sort();
-
-
+	printf("\n\n");
 	return 0;
 }

@@ -1,7 +1,7 @@
 
 ## 编译顺利但IDE提示一些符号未解决的问题
 
-当前也许还使用Eclipse，尤其使用NDK进行Native支持。在Eclipse里CDT进行c/c++时，尽管编译可能通过，有的可能编译后就好了（也许和发现分析有关）；但往往IDE总会提示未解决的符号，看着不太好。
+当前也许还使用Eclipse，尤其使用NDK进行Native支持。在Eclipse里CDT进行c/c++时，尽管编译可能通过，有的可能编译后就好了（也许和发现分析有关）；但往往IDE总会提示未解决的符号，看着不太好。大部分原因是，Android.mk等文件的配置是给ndk-build（调用make再调用gcc工具集如g++）编译工具看的，运行ndk-build会自动从当前工程路径下找mk文件；而eclipse在做IDE的工作时却不知道，故无法自动智能的发现符号，需要手动设置。这就不太好了，有的地方要修改两处，比如：引入某include既要在mk文件配置一下告诉ndk-build，又要在告诉eclipse。
 
 看[“Unresolved inclusion” error with Eclipse CDT for C standard library headers](http://stackoverflow.com/questions/9337757/unresolved-inclusion-error-with-eclipse-cdt-for-c-standard-library-headers#answer-9337926)
 回答指出，Eclipse使用的编译器能识别符号并成功编译，而IDE里提示却不能，是两码事。
@@ -67,6 +67,8 @@ Android的
 
 最后也许还需要重建索引：Projects -> C/C++ Index -> Rebuild。如果Include不对还可以通过 Discovery Options 面板（就是选择androidPerProjectProfile的那里）里点击Clear按钮清除。
 
+注意，CDT8.1以后的某个版本，反正最新8.6版本Discovery Options面板已经彻底移除了。
+
 @see [Eclipse/ADT plugin cannot locate symbols for r10d NDK](https://code.google.com/p/android/issues/detail?id=97023)
 指出，r10e可以。
 
@@ -106,17 +108,17 @@ androidPerProjectProfile没有用了吗，其内容可能在某处，如https://
 > the compiler and some other compiler options are normally also
 > recognized. For gcc, include paths commonly passed with "-I" option
 > and macros with "-D" option. The language settings found by BOP are
-> available after the build is finished.
+> available after the build is finished.  
 > **Builtin Compiler Settings Provider** Builtin Compiler Settings Provider launches the compiler with special options that instruct the
 > compiler to print built-in settings such as include paths to internal
 > system headers and the list of internally predefined macros. This
 > provider is usually shared between projects in workspace and runs in
 > background once. When it is finished the language settings are
-> available to all the projects between which it is shared.
-> **Managed Build Language Settings Provider** MBS Provider supplies language settings provided by Managed Build System.
+> available to all the projects between which it is shared.  
+> **Managed Build Language Settings Provider** MBS Provider supplies language settings provided by Managed Build System.  
 > **User Language Settings Provider** A user has an opportunity to enter language settings manually using this provider. User Language Settings
 > Provider should be normally the first in the list so these settings
-> override settings supplied by other providers.
+> override settings supplied by other providers.  
 > **Contributed PathEntry Containers** This provider is here for backward compatibility support of PathEntry Containers from older
 > versions of CDT. Using this method is not recommended.
 > 
@@ -152,3 +154,23 @@ set NDK_ROOT=%~dp0
 
 从上面看出，Build Output Parser如何使用make，如何使用g++来分析的，不明。
 
+从官网[ndk-build > Invoking from the Command Line > options](http://developer.android.com/ndk/guides/ndk-build.html#options)指出：  
+`V=1 Launch build, and display build commands.`  
+![Android_cpp_project_properties_C++Builder_BuilderSettings.png](./Android_cpp_project_properties_C++Builder_BuilderSettings.png)  
+使用后打印如下：
+```
+[armeabi] Compile++ thumb: helloworld <= helloworld.cpp
+F:/Android/android-ndk-r10/toolchains/arm-linux-androideabi-4.6/prebuilt/windows/bin/arm-linux-androideabi-g++ -MMD -MP -MF ./obj/local/armeabi/objs/helloworld/helloworld.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -IF:/Android/android-ndk-r10/sources/cxx-stl/llvm-libc++/libcxx/include -IF:/Android/android-ndk-r10/sources/cxx-stl/llvm-libc++/../llvm-libc++abi/libcxxabi/include -IF:/Android/android-ndk-r10/sources/cxx-stl/llvm-libc++/../../android/support/include -Ijni/HelloWorld -DANDROID  -Wa,--noexecstack -Wformat -Werror=format-security -std=c++11 -fno-strict-aliasing -std=c++11     -IF:/Android/android-ndk-r10/platforms/android-9/arch-arm/usr/include -c  jni/HelloWorld/helloworld.cpp -o ./obj/local/armeabi/objs/helloworld/helloworld.o 
+[armeabi] Executable     : helloworld
+F:/Android/android-ndk-r10/toolchains/arm-linux-androideabi-4.6/prebuilt/windows/bin/arm-linux-androideabi-g++ -Wl,--gc-sections -Wl,-z,nocopyreloc --sysroot=F:/Android/android-ndk-r10/platforms/android-9/arch-arm -Wl,-rpath-link=F:/Android/android-ndk-r10/platforms/android-9/arch-arm/usr/lib -Wl,-rpath-link=./obj/local/armeabi ./obj/local/armeabi/objs/helloworld/helloworld.o F:/Android/android-ndk-r10/sources/cxx-stl/llvm-libc++/libs/armeabi/thumb/libc++_static.a -lgcc -no-canonical-prefixes  -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now   -lc -lm -o ./obj/local/armeabi/helloworld
+[armeabi] Install        : helloworld => libs/armeabi/helloworld
+copy /b/y ".\obj\local\armeabi\helloworld" ".\libs\armeabi\helloworld" > NUL
+F:/Android/android-ndk-r10/toolchains/arm-linux-androideabi-4.6/prebuilt/windows/bin/arm-linux-androideabi-strip --strip-unneeded  ./libs/armeabi/helloworld
+```
+编译好后再次右键工程编译，如果没有改动就不会重新调用g++。  
+```
+[armeabi] Install        : helloworld => libs/armeabi/helloworld
+copy /b/y ".\obj\local\armeabi\helloworld" ".\libs\armeabi\helloworld" > NUL
+F:/Android/android-ndk-r10/toolchains/arm-linux-androideabi-4.6/prebuilt/windows/bin/arm-linux-androideabi-strip --strip-unneeded  ./libs/armeabi/helloworld
+```
+从上面看到在windows-x86_64平台交叉编译arm使用的g++是arm-linux-androideabi-g++，这里使用Build Output Parser Provider的发现编译器的默认表达式`(gcc)|([gc]\+\+)|(clang)`并且Move Up到最上面貌似不起作用。
