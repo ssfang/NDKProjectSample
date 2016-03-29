@@ -58,9 +58,11 @@ endif
 
 #注意，如果其他mk文件也使用LOCAL_PATH，是共享的
 # create a temp variable with the current path, because it changes
-# after each include
+# after each include 
+# @see http://developer.android.com/ndk/guides/android_mk.html#npfm
 TOP_LOCAL_PATH := $(LOCAL_PATH)
 
+# @see https://www.gnu.org/software/make/manual/html_node/Include.html
 include $(TOP_LOCAL_PATH)/HelloWorld/Android.mk
 #include $(TOP_LOCAL_PATH)/MessagePack/Android.mk
 #include $(TOP_LOCAL_PATH)/toy/Android.mk
