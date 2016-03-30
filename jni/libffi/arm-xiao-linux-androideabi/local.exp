@@ -1,0 +1,2 @@
+set CC_FOR_TARGET "arm-linux-androideabi-gcc"
+set CXX_FOR_TARGET "arm-linux-androideabi-g++"
