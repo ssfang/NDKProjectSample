@@ -64,6 +64,7 @@ TOP_LOCAL_PATH := $(LOCAL_PATH)
 
 # @see https://www.gnu.org/software/make/manual/html_node/Include.html
 include $(TOP_LOCAL_PATH)/HelloWorld/Android.mk
+include $(TOP_LOCAL_PATH)/libffi/Android.mk
 #include $(TOP_LOCAL_PATH)/MessagePack/Android.mk
 #include $(TOP_LOCAL_PATH)/toy/Android.mk
 

@@ -80,38 +80,10 @@ int main(int argc, const char *argv[]) {
 	printf("find_first_of: %d\n", str.find_first_of("an"));
 	printf("find_first_not_of: %d\n", str.find_first_not_of("fang"));
 
-	std::bitset<4> foo;     // foo: 0000
-	foo.set();              // foo: 1111
-	printf("as an integer is: %lu\n", foo.to_ulong());
-
-	auto first = std::make_tuple(10, 'a');             // tuple < int, char >
-	const int a = 0;
-	int b[3];                         // decayed types:
-	auto second = std::make_tuple(a, b);               // tuple < int, int* >
-	auto third = std::make_tuple(std::ref(a), "abc"); // tuple < const int&, const char* >
-	printf("third contains: %d and %s\n", std::get < 0 > (third),
-			std::get < 1 > (third));
-
-	std::vector<int> myvector;	// = { 10, 20, 30 };
-
-	myvector.push_back(22);
-
-	myvector.emplace_back(100);
-	myvector.emplace_back(200);
-
-	printf("myvector contains:");
-
-	for (std::vector<int>::iterator it = myvector.begin(); it != myvector.end();
-			++it)
-		printf(" %d", *it);
-	printf("\n");
 
 	int myints[] = { 32, 71, 12, 45, 26, 80, 53, 33 };
 	std::sort(myints, myints + 4);
 
-	for (auto& x : myvector)
-		printf(" %d", x);
-	printf("\n");
 
 	std::list<int> mylist;
 	printf("mylist.size() = %d, mylist.max_size() = %u\n", mylist.size(),
